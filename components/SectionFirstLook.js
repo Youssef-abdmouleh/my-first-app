@@ -7,7 +7,7 @@ function SectionFirstLook({image,title}) {
             <section className="first-look">
                 <h2>{title}</h2>
                 <div className="first-look-container">
-                    <Image  src={image} alt={title} fill style={{objectFit:"cover"}}/>
+                    <img  src={image} alt={title} fill style={{objectFit:"cover"}}/>
                 </div>
             </section>
         </>

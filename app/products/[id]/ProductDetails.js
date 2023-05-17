@@ -19,7 +19,7 @@ const ProductDetails = async ({params}) => {
         <div className="container">
             <div className="row mt-5">
                 <div className="col-5">
-                    <Image src={product.images[0]} className="img-fluid rounded-start" height={500} width={500} alt={product.title} />
+                    <img src={product.images[0]} className="img-fluid rounded-start" height={500} width={500} alt={product.title} />
                 </div>
                 <div className="col-6 mt-5">
                     <h2 className="my-4">{product.title}</h2>
