@@ -4,7 +4,7 @@ const nextConfig = {
     appDir: true,
   },
   images:{
-    domains:["https://picsum.photos","api.lorem.space","firevasestorage.googleapis.com"],
+    domains:["https://picsum.photos","api.lorem.space","firebasestorage.googleapis.com"],
 }
 }
 

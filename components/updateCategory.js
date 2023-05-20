@@ -1,38 +1,61 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { TextField, Box, Button, Modal, Typography } from '@mui/material';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
+
+import { FilePond,registerPlugin } from 'react-filepond';
+import 'filepond/dist/filepond.min.css';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
+
+import {UploadFirebase} from '../utils/UploadFirebase';
+
 const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 550,
-    height: 400,
-    maxHeight: 450,
+    height: 650,
+    maxHeight: 650,
     bgcolor: 'background.paper', border: '2px solid #000',
     boxShadow: 24,
     color: '#000',
     borderRadius: '20px',
-    padding: '40px 30px 60px',
+    padding: '40px 30px 20px',
     textAlign: 'center',
 };
+
 function updateCategory(props) {
-    const id = props.categories.id;
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [inputs, setInputs] = useState(props.categories);
-    const handleChange = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
-        setInputs(values => ({ ...values, [name]: value }))
-    }
-    const handlesave = async () => {
+
+    const [id,setId] =useState();
+    const [name,setName] = useState();
+    const [image,setImage] = useState();
+    const [file,setFile] = useState();
+    useEffect(()=>{
+        setId(props.categories.id);
+        setName(props.categories.name);
+        setImage(props.categories.image);
+    },[]);
+
+    const handlesave = async (url) => {
+        setImage(url);
+        setImage(url);
+        const cat={
+            id:id,
+            name:name,
+            image:url,
+        };
+
         const res = await (await
             fetch('https://api.escuelajs.co/api/v1/categories/' + id, {
                 method: 'PUT',
-                body: JSON.stringify(inputs),
+                body: JSON.stringify(cat),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -43,6 +66,29 @@ function updateCategory(props) {
         }
         else {
             console.log(res);
+        }
+    }
+
+
+    const handleUpload=(event)=>{
+        event.preventDefault();
+        if(!file){
+            const url=image;
+            handlesave(url);
+        }
+        else{
+            console.log(file[0],file)
+            resultHandleUpload(file[0].file)
+        }
+    }
+    const resultHandleUpload = async(file) =>{
+        try{
+            const url = await UploadFirebase(file);
+            console.log(url);
+            handlesave(url);
+        }
+        catch(error){
+            console.log(error)
         }
     }
     return (
@@ -62,17 +108,26 @@ function updateCategory(props) {
                     </Typography>
                     <hr />
                     <div className="mb-4">
-                        <TextField variant="outlined" value={inputs.name} name="name"
-                            label="Name" onChange={handleChange} />
+                        <TextField variant="outlined" value={name} name="name"
+                            label="Name" onChange={e=>setName(e.target.value)} />
                     </div>
                     <div className="mb-4">
-                        <TextField variant="outlined" value={inputs.image} name="image"
-                            label="Image" onChange={handleChange} />
+                        {!file?<img src={image} style={{width:'50px',height:'50px'}}/>:null}
+                        <h6>Select new image</h6>
+                        <center>
+                            <div style={{width:200,height:250}}>
+                                <FilePond
+                                    files={file}
+                                    onupdatefiles={setFile}
+                                    allowMultiple={false}
+                                    labelIdle='<span class="filepond--label-action">Browse One</span>'/>
+                            </div>
+                        </center>
                     </div>
                     <hr />
                     <div className="mb-3">
                         <Button type="button" className="btn btn-success"
-                            onClick={handlesave}>Update</Button>
+                            onClick={(event)=>handleUpload(event)}>Update</Button>
                         <Button type="button" className="btn btn-secondary"
                             onClick={handleClose}>Close</Button>
                     </div>

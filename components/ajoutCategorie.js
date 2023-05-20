@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from 'react';
 import { TextField, Box, Button, Modal, Typography } from '@mui/material';
-import { FilePond,registerPlugin } from 'react-filepond';
-import FilePondPluginImageExifOrientation from'filepond-plugin-image-exif-orientation'
-import FilePondPluginImagePreview from'filepond-plugin-image-preview'
+import { FilePond, registerPlugin } from 'react-filepond';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
-registerPlugin(FilePondPluginImageExifOrientation,FilePondPluginImagePreview)
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 import { UploadFirebase } from '@/utils/UploadFirebase';
 
 const style = {
@@ -28,17 +28,28 @@ function AjoutCat() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [name, setName] = useState('');
+    const [image, setImage] = useState('');
+    const [file, setFile] = useState(null);
     const [inputs, setInputs] = useState({});
     const handleChange = (e) => {
         const name = e.target.name;
         const value = e.target.value;
         setInputs(values => ({ ...values, [name]: value }))
     }
-    const handlesave = async () => {
+
+
+    const handlesave = async (url) => {
+        setImage(url);
+        const cat = {
+            name: name,
+            image: url,
+        };
+
         const res = await (await
             fetch('https://api.escuelajs.co/api/v1/categories', {
                 method: 'POST',
-                body: JSON.stringify(inputs),
+                body: JSON.stringify(cat),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -51,6 +62,33 @@ function AjoutCat() {
             console.log(res);
         }
     }
+
+
+    const handleUpload = (event) => {
+        event.preventDefault();
+        if (!file[0].file) {
+            alert("Please upload an image first!");
+        }
+        else {
+            console.log(file[0].file)
+            resultHandleUpload(file[0].file, event);
+        }
+        if (!file[0].file) {
+            alert("Please upload an image first!");
+        }
+    };
+
+
+    const resultHandleUpload = async (file) => {
+        try {
+            const url = await UploadFirebase(file);
+            console.log(url);
+            handlesave(url)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div><Button type="button" className="btn btn-primary" onClick={handleOpen}>
             ADD
@@ -69,14 +107,27 @@ function AjoutCat() {
                         <TextField variant="outlined" name="name" label="Name"
                             onChange={handleChange} />
                     </div>
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                         <TextField variant="outlined" name="image"
-                            label="Image" onChange={handleChange} />
+                            label="Image" onChange={e => setName(e.target.value)} />
+                    </div> */}
+                    <div className='mb-4'>
+                        <h6>Select image</h6>
+                        <center>
+                            <div style={{ width: 200, height: 250 }}>
+                            <FilePond
+                                files={file}
+                                allowMultiple={false}
+                                onupdatefiles={setFile}
+                                labelIdle='<span class="filepond--label-action">Browse One</span>'
+                            />
+                            </div>
+                        </center>
                     </div>
                     <hr />
                     <div className="mb-3">
                         <Button type="button" className="btn btn-danger"
-                            onClick={handlesave}>Save</Button>
+                            onClick={(event)=>handleUpload(event)}>Save</Button>
                         <Button type="button" className="btn btn-secondary"
                             onClick={handleClose}>Close</Button>
                     </div>
