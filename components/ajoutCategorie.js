@@ -73,12 +73,7 @@ function AjoutCat() {
             console.log(file[0].file)
             resultHandleUpload(file[0].file, event);
         }
-        if (!file[0].file) {
-            alert("Please upload an image first!");
-        }
     };
-
-
     const resultHandleUpload = async (file) => {
         try {
             const url = await UploadFirebase(file);
@@ -107,10 +102,6 @@ function AjoutCat() {
                         <TextField variant="outlined" name="name" label="Name"
                             onChange={handleChange} />
                     </div>
-                    {/* <div className="mb-4">
-                        <TextField variant="outlined" name="image"
-                            label="Image" onChange={e => setName(e.target.value)} />
-                    </div> */}
                     <div className='mb-4'>
                         <h6>Select image</h6>
                         <center>
