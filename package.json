@@ -16,7 +16,7 @@
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.10",
-    "axios": "^1.4.0",
+    "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
     "filepond": "^4.30.4",
     "filepond-plugin-image-exif-orientation": "^1.0.11",
